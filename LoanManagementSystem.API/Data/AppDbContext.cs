@@ -53,8 +53,13 @@ namespace LoanManagementSystem.API.Data
        .HasPrecision(18, 2);
 
             modelBuilder.Entity<LoanApplication>()
-                .Property(x => x.EmiAmount)
+      .Property(x => x.LoanAmount)
+      .HasPrecision(18, 2);
+
+            modelBuilder.Entity<LoanApplication>()
+                .Property(x => x.OutstandingAmount)
                 .HasPrecision(18, 2);
+
 
             modelBuilder.Entity<EmiSchedule>()
                 .Property(x => x.EmiAmount)
