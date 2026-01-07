@@ -49,7 +49,8 @@ namespace LoanManagementSystem.API.Controllers
             loan.IsVerified = true;
             loan.VerificationRemarks = dto.Remarks;
             loan.Status = dto.IsApproved ? "Approved" : "Rejected";
-
+            loan.VerifiedOn = DateTime.Now;
+   
             if (dto.IsApproved)
             {
                 var emi = _emiService.CalculateEmi(
