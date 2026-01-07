@@ -37,7 +37,7 @@ public class EmiController : ControllerBase
          LoanAmount = g.First().LoanApplication.LoanAmount,
          TenureMonths = g.First().LoanApplication.TenureMonths,
          InterestRate = g.First().LoanApplication.LoanType.InterestRate,
-         Emi = g.First().EmiAmount,   // 👈 real EMI
+         Emi = g.First().EmiAmount,  
          PendingMonths = g.Count(),
          Status = g.First().LoanApplication.Status
      })
@@ -78,7 +78,7 @@ public class EmiController : ControllerBase
             PaidAmount = nextEmi.EmiAmount
         });
         loan.OutstandingAmount -= nextEmi.EmiAmount;
-        // 🔔 EMI PAID notification
+      
         await LoanNotificationQueue.Channel.Writer.WriteAsync(new LoanNotificationEvent
         {
             LoanId = loanApplicationId,
@@ -90,11 +90,12 @@ public class EmiController : ControllerBase
         bool allPaid = !_context.EmiSchedules
      .Any(e => e.LoanApplicationId == loanApplicationId && !e.IsPaid);
 
-        if (allPaid)
-        {
-            loan.OutstandingAmount = 0;  
+        if(allPaid)
+{
+            loan.OutstandingAmount = 0;
             loan.Status = "Closed";
 
+            // Customer notification (already working)
             await LoanNotificationQueue.Channel.Writer.WriteAsync(new LoanNotificationEvent
             {
                 LoanId = loanApplicationId,
@@ -102,7 +103,21 @@ public class EmiController : ControllerBase
                 Title = "Loan Closed",
                 Message = "Your loan has been closed successfully. Thank you!"
             });
+
+            // Admin notification (NEW)
+            var admins = await _context.Users.Where(x => x.Role == "Admin").ToListAsync();
+
+            foreach (var admin in admins)
+            {
+                _context.LoanNotifications.Add(new LoanNotification
+                {
+                    UserId = admin.UserId,
+                    Title = "Loan Closed",
+                    Message = $"Loan #{loanApplicationId} has been fully paid by customer."
+                });
+            }
         }
+
         await _context.SaveChangesAsync();
         return Ok($"EMI for Month {nextEmi.MonthNumber} paid successfully.");
     }
