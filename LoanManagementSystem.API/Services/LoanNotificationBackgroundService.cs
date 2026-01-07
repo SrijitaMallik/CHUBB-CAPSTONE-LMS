@@ -1,5 +1,6 @@
-﻿using LoanManagementSystem.API.Data;
+using LoanManagementSystem.API.Data;
 using LoanManagementSystem.API.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LoanManagementSystem.API.Services
 {
@@ -21,17 +22,45 @@ namespace LoanManagementSystem.API.Services
                 using var scope = _scopeFactory.CreateScope();
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-                db.LoanNotifications.Add(new LoanNotification
+                // Get target user IDs based on notification type
+                var targetUserIds = new List<int>();
+
+                if (evt.NotifyCustomer && evt.UserId > 0)
                 {
-                    LoanId = evt.LoanId,
-                    UserId = evt.UserId,
-                    Title = evt.Title,
-                    Message = evt.Message
-                });
+                    targetUserIds.Add(evt.UserId);
+                }
+
+                if (evt.NotifyLoanOfficers)
+                {
+                    var loanOfficers = await db.Users
+                        .Where(u => u.Role == "LoanOfficer" && u.IsActive)
+                        .Select(u => u.UserId)
+                        .ToListAsync();
+                    targetUserIds.AddRange(loanOfficers);
+                }
+
+                if (evt.NotifyAdmins)
+                {
+                    var admins = await db.Users
+                        .Where(u => u.Role == "Admin" && u.IsActive)
+                        .Select(u => u.UserId)
+                        .ToListAsync();
+                    targetUserIds.AddRange(admins);
+                }
+
+                foreach (var userId in targetUserIds.Distinct())
+                {
+                    db.LoanNotifications.Add(new LoanNotification
+                    {
+                        LoanId = evt.LoanId,
+                        UserId = userId,
+                        Title = evt.Title,
+                        Message = evt.Message
+                    });
+                }
 
                 await db.SaveChangesAsync();
-
-                Console.WriteLine($"NOTIFICATION => {evt.Title} for Loan {evt.LoanId}");
+                Console.WriteLine($"NOTIFICATION => {evt.Title} for Loan {evt.LoanId} sent to {targetUserIds.Count} users");
             }
         }
     }
