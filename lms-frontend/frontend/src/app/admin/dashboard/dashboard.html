@@ -1,0 +1,18 @@
+<h1>Admin Analytics Dashboard</h1>
+
+<div class="kpi-row">
+ <div class="kpi-card">{{ totalCustomers }}<p>Total Customers</p></div>
+ <div class="kpi-card">{{ activeLoans }}<p>Active Loans</p></div>
+ <div class="kpi-card">{{ closedLoans }}<p>Closed Loans</p></div>
+</div>
+
+<div class="grid">
+ <div class="card">
+   <h3>Loan Status Distribution</h3>
+   <canvas id="statusChart"></canvas>
+ </div>
+ <div class="card">
+   <h3>Customer Loan Distribution</h3>
+   <canvas id="customerChart"></canvas>
+ </div>
+</div>

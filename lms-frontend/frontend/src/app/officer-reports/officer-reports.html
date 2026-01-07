@@ -1,0 +1,87 @@
+<h2>Loan History</h2>
+
+<!-- ✅ Loading State -->
+<div *ngIf="loading()" class="loading-container">
+  <p>Loading history...</p>
+</div>
+
+<!-- ✅ Filters -->
+<div *ngIf="!loading()" class="history-filters">
+
+  <input 
+    type="text" 
+    placeholder="Search customer..."
+    [(ngModel)]="searchText"
+    (input)="applyFilter()">
+
+  <select 
+    [(ngModel)]="statusFilter" 
+    (change)="applyFilter()">
+    <option value="">All Status</option>
+    <option>Approved</option>
+    <option>Rejected</option>
+  </select>
+
+  <button class="clear-btn" (click)="clearFilter()">Clear</button>
+
+</div>
+
+<!-- ✅ Data Table -->
+<div *ngIf="!loading()" class="table-wrapper">
+  <table *ngIf="pagedLoans().length > 0">
+    <thead>
+      <tr>
+        <th>Customer</th>
+        <th>Loan</th>
+        <th>Amount</th>
+        <th>Tenure</th>
+        <th>Status</th>
+        <th>Approved On</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let h of pagedLoans()">
+        <td>{{h.customerName}}</td>
+        <td>{{h.loanType?.loanTypeName || h.loanType}}</td>
+        <td>₹{{h.amount || h.loanAmount | number}}</td>
+        <td>{{h.tenure || h.tenureMonths}} months</td>
+        <td>
+          <span class="pill"
+                [ngClass]="h.status=='Approved' ? 'green' : 'red'">
+                {{h.status}}
+          </span>
+        </td>
+        <td>{{h.approvedOn || h.verifiedOn | date:'dd MMM yyyy, hh:mm a'}}</td>
+      </tr>
+    </tbody>
+
+  </table>
+
+  <!-- ✅ Empty State -->
+  <div *ngIf="pagedLoans().length === 0" class="empty-container">
+    <p>No loan history found</p>
+  </div>
+</div>
+
+<!-- ✅ Pagination -->
+<div *ngIf="!loading() && loans().length > 0" class="pagination-bar">
+
+  <div class="page-info">
+    Items per page:
+    <select 
+      [(ngModel)]="pageSize" 
+      (change)="changePage(1)">
+      <option [value]="5">5</option>
+      <option [value]="10">10</option>
+      <option [value]="20">20</option>
+    </select>
+  </div>
+
+  <div class="page-controls">
+    <button (click)="prevPage()" [disabled]="page()==1">⟨</button>
+    <span>{{page()}} / {{totalPages()}}</span>
+    <button (click)="nextPage()" [disabled]="page()==totalPages()">⟩</button>
+  </div>
+
+</div>

@@ -1,0 +1,144 @@
+<div class="apply-loan-container">
+  <!-- Back Link -->
+  <a href="javascript:void(0);" class="back-link" (click)="router.navigate(['/customer-dashboard'])">
+    ← Back to Dashboard
+  </a>
+
+  <!-- Notification -->
+  <div *ngIf="notification" class="notification" [ngClass]="'notification-' + notification.type">
+    <div class="notification-content">
+      <span>{{ notification.message }}</span>
+      <button class="notification-close" (click)="closeNotification()">✕</button>
+    </div>
+  </div>
+
+  <!-- Form Container -->
+  <div class="form-container">
+    <div class="form-header">
+      <h1>Apply for Loan</h1>
+      <p>Fill in the details to submit your application</p>
+    </div>
+
+    <form (ngSubmit)="submitApplication(form)" #form="ngForm" class="loan-form">
+      <!-- Loan Application Form Card -->
+      <div class="form-card">
+        <div class="card-header">
+          <h2>Loan Application Form</h2>
+          <p>Please provide accurate information</p>
+        </div>
+
+        <!-- Loan Type -->
+        <div class="form-group">
+          <label for="loanType">Loan Type <span class="required">*</span></label>
+          <select
+            id="loanType"
+            [(ngModel)]="formData.loanType"
+            name="loanType"
+            required
+            class="form-control"
+          >
+            <option value="">Select loan type</option>
+            <option *ngFor="let type of loanTypes" [value]="type.loanTypeId">
+              {{ type.loanTypeName }}
+            </option>
+          </select>
+          <small class="help-text">Choose the type of loan you want to apply for</small>
+        </div>
+
+        <!-- Loan Amount -->
+        <div class="form-group">
+          <label for="loanAmount">Loan Amount (₹) <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <span class="currency-symbol">₹</span>
+            <input
+              id="loanAmount"
+              type="number"
+              [(ngModel)]="formData.loanAmount"
+              name="loanAmount"
+              placeholder="1255678"
+              required
+              min="1000"
+              class="form-control"
+            />
+          </div>
+          <small class="help-text">Enter the amount you wish to borrow</small>
+        </div>
+
+        <!-- Loan Tenure -->
+        <div class="form-group">
+          <label for="loanTenure">Loan Tenure (Months) <span class="required">*</span></label>
+          <input
+            id="loanTenure"
+            type="number"
+            [(ngModel)]="formData.loanTenure"
+            name="loanTenure"
+            placeholder="4"
+            required
+            min="1"
+            max="360"
+            class="form-control"
+          />
+          <small class="help-text">Duration in months for loan repayment</small>
+        </div>
+
+        <!-- Monthly Income -->
+        <div class="form-group">
+          <label for="monthlyIncome">Monthly Income (₹) <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <span class="currency-symbol">₹</span>
+            <input
+              id="monthlyIncome"
+              type="number"
+              [(ngModel)]="formData.monthlyIncome"
+              name="monthlyIncome"
+              placeholder="1234"
+              required
+              min="1000"
+              class="form-control"
+            />
+          </div>
+          <small class="help-text">Your total monthly income</small>
+        </div>
+
+        <!-- Important Information -->
+        <div class="info-box">
+          <div class="info-icon">ℹ️</div>
+          <div>
+            <strong>Important Information</strong>
+            <p>All fields marked with * are mandatory. Please ensure all information is accurate before submitting.</p>
+          </div>
+        </div>
+
+        <!-- Terms Checkbox -->
+        <div class="form-group checkbox-group">
+          <input
+            type="checkbox"
+            id="terms"
+            [(ngModel)]="formData.terms"
+            name="terms"
+            required
+          />
+          <label for="terms">I agree to the terms and conditions</label>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+          <button
+            type="submit"
+            [disabled]="isSubmitting"
+            class="btn-submit"
+          >
+            {{ isSubmitting ? '⏳ Submitting...' : '✓ Submit Application' }}
+          </button>
+          <button
+            type="button"
+            (click)="cancel()"
+            class="btn-cancel"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

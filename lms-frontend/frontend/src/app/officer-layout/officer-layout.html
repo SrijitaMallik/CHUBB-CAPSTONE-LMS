@@ -1,0 +1,41 @@
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="logo">🏦 LMS</div>
+
+    <nav>
+      <a routerLink="/loan-officer/dashboard" routerLinkActive="active">
+        📊 Dashboard
+      </a>
+      <a routerLink="/loan-officer/applications" routerLinkActive="active">
+        📄 Applications
+      </a>
+      <a routerLink="/loan-officer/reports" routerLinkActive="active">
+        📈 Reports
+      </a>
+    </nav>
+
+    <div class="user">
+      <button class="logout-btn" (click)="logout()">
+        🚪 Logout
+      </button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+<div class="notif-bell" (click)="toggleNotif()">
+ 🔔 <span *ngIf="unreadCount>0" class="badge">{{unreadCount}}</span>
+</div>
+
+<div *ngIf="showNotif" class="notif-panel">
+ <div *ngFor="let n of notifications"
+      (click)="openNotif(n)"
+      [class.unread]="!n.isRead"
+      class="notif-item">
+      {{n.message}}
+ </div>
+</div>
+
+</div>

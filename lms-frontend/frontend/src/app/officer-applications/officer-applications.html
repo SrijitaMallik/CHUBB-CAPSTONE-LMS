@@ -1,0 +1,109 @@
+<div class="saas-app-page">
+
+  <div class="saas-app-header">
+    <h2>Loan Applications</h2>
+
+    <div class="saas-filters">
+      <input 
+        type="text" 
+        placeholder="Search customer..."
+        [(ngModel)]="searchText"
+        (input)="applyFilter()"
+        [disabled]="loading()">
+
+      <select 
+        [(ngModel)]="statusFilter"
+        (change)="applyFilter()"
+        [disabled]="loading()">
+        <option value="">All</option>
+        <option>Pending</option>
+        <option>Approved</option>
+        <option>Rejected</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ✅ Loading State -->
+  <div *ngIf="loading()" class="loading-container">
+    <p>Loading applications...</p>
+  </div>
+
+  <!-- ✅ Data Table -->
+  <div *ngIf="!loading()">
+    <table class="saas-table" *ngIf="pagedLoans().length > 0">
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Loan Type</th>
+          <th>Amount</th>
+          <th>Tenure</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let l of pagedLoans()">
+          <td>
+            <div class="customer-info">
+              <div class="customer-name">{{l.customerName || 'N/A'}}</div>
+              <div class="customer-id">#{{l.customerId || l.userId || 'N/A'}}</div>
+            </div>
+          </td>
+          <td>{{l.loanType?.loanTypeName || l.loanType?.name}}</td>
+          <td>₹{{l.loanAmount | number}}</td>
+          <td>{{l.tenureMonths}} months</td>
+          <td>
+            <span class="status-pill" [ngClass]="l.status.toLowerCase()">
+              {{l.status}}
+            </span>
+          </td>
+          <td>
+            <button 
+              class="btn approve" 
+              (click)="approve(l.loanApplicationId)"
+              [disabled]="loading() || approving()"
+              [style.cursor]="loading() || approving() ? 'not-allowed' : 'pointer'">
+              {{ approving() ? 'Processing...' : 'Approve' }}
+            </button>
+            <button 
+              class="btn reject" 
+              (click)="reject(l.loanApplicationId)"
+              [disabled]="loading() || approving()"
+              [style.cursor]="loading() || approving() ? 'not-allowed' : 'pointer'">
+              {{ approving() ? 'Processing...' : 'Reject' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ✅ Empty State -->
+    <div *ngIf="pagedLoans().length === 0" class="empty-container">
+      <p>No applications found</p>
+    </div>
+  </div>
+
+  <!-- ✅ Pagination -->
+  <div *ngIf="!loading() && loans().length > 0" class="pagination-bar">
+
+    <div class="page-info">
+      Items per page:
+      <select 
+        [(ngModel)]="pageSize"
+        (change)="changePage(1)">
+        <option [value]="5">5</option>
+        <option [value]="10">10</option>
+        <option [value]="20">20</option>
+      </select>
+    </div>
+
+    <div class="page-controls">
+      <button (click)="prevPage()" [disabled]="page()==1">⟨</button>
+      <span>{{page()}} / {{totalPages()}}</span>
+      <button (click)="nextPage()" [disabled]="page()==totalPages()">⟩</button>
+    </div>
+
+  </div>
+
+</div>

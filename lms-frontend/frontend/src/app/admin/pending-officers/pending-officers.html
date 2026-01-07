@@ -1,0 +1,59 @@
+<div class="page-title">Pending Loan Officers</div>
+
+<!-- ✅ Loading State -->
+<div *ngIf="loading()" class="loading-container">
+  <div class="spinner"></div>
+  <p>Loading officers...</p>
+</div>
+
+<!-- ✅ Error State -->
+<div *ngIf="error() && !loading()" class="error-container">
+  <p class="error-message">{{ error() }}</p>
+  <button class="btn retry" (click)="load()">Retry</button>
+</div>
+
+<!-- ✅ Data Table -->
+<div *ngIf="!loading() && officers().length > 0" class="table-card">
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Officer Name</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let o of officers(); let i = index">
+        <td>{{i+1}}</td>
+        <td>{{o.fullName}}</td>
+        <td>{{o.email}}</td>
+        <td>
+          <span class="badge pending">Pending</span>
+        </td>
+        <td class="actions">
+          <button 
+            class="btn approve" 
+            (click)="approve(o.userId)"
+            [disabled]="loading()">
+            Approve
+          </button>
+          <button 
+            class="btn reject" 
+            (click)="reject(o.userId)"
+            [disabled]="loading()">
+            Reject
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ✅ Empty State -->
+<div *ngIf="!loading() && officers().length === 0" class="empty-container">
+  <p>No pending officers found</p>
+  <button class="btn retry" (click)="load()">Refresh</button>
+</div>

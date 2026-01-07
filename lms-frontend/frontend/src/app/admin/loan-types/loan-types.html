@@ -1,0 +1,100 @@
+<div class="header-bar">
+  <h2>Loan Types</h2>
+  <button class="add-btn" (click)="openAdd()" [disabled]="loading()">＋ Add Loan Type</button>
+</div>
+
+<!-- ✅ Loading State -->
+<div *ngIf="loading()" class="loading-container">
+  <p>Loading loan types...</p>
+</div>
+
+<!-- ✅ Data Table -->
+<div *ngIf="!loading()">
+  <table class="loan-table" *ngIf="loanTypes().length > 0">
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Interest</th>
+      <th>Min Amount</th>
+      <th>Max Amount</th>
+      <th>Tenure</th>
+      <th>Actions</th>
+    </tr>
+
+    <tr *ngFor="let l of loanTypes()">
+      <td>{{l.loanTypeId}}</td>
+      <td>{{l.loanTypeName}}</td>
+      <td>{{l.interestRate}}%</td>
+      <td>₹{{l.minAmount}}</td>
+      <td>₹{{l.maxAmount}}</td>
+      <td>{{l.maxTenureMonths}} months</td>
+      <td class="actions">
+        <button class="icon-btn edit" title="Edit" (click)="edit(l)">✏️</button>
+        <button class="icon-btn delete" title="Disable" (click)="disable(l.loanTypeId)">🗑️</button>
+      </td>
+    </tr>
+  </table>
+
+  <!-- ✅ Empty State -->
+  <div *ngIf="loanTypes().length === 0" class="empty-container">
+    <p>No loan types found</p>
+  </div>
+</div>
+
+<!-- ✅ EDIT POPUP -->
+<div *ngIf="editData()" class="popup">
+  <div class="popup-content">
+    <h3>Edit Loan Type</h3>
+
+    <label>Loan Name</label>
+    <input [(ngModel)]="editData().loanTypeName" [disabled]="saving()">
+
+    <label>Interest Rate (%)</label>
+    <input [(ngModel)]="editData().interestRate" type="number" [disabled]="saving()">
+
+    <label>Minimum Amount (₹)</label>
+    <input [(ngModel)]="editData().minAmount" type="number" [disabled]="saving()">
+
+    <label>Maximum Amount (₹)</label>
+    <input [(ngModel)]="editData().maxAmount" type="number" [disabled]="saving()">
+
+    <label>Maximum Tenure (Months)</label>
+    <input [(ngModel)]="editData().maxTenureMonths" type="number" [disabled]="saving()">
+
+    <div class="popup-actions">
+      <button class="primary" [disabled]="saving()" (click)="save()">
+        {{saving() ? 'Saving...' : 'Save'}}
+      </button>
+      <button class="secondary" [disabled]="saving()" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ ADD POPUP -->
+<div *ngIf="showAdd()" class="popup">
+  <div class="popup-content">
+    <h3>Add Loan Type</h3>
+
+    <label>Loan Name</label>
+    <input [(ngModel)]="newLoan().loanTypeName" placeholder="Eg: Home Loan" [disabled]="creating()">
+
+    <label>Interest Rate (%)</label>
+    <input [(ngModel)]="newLoan().interestRate" type="number" placeholder="Eg: 12" [disabled]="creating()">
+
+    <label>Minimum Amount (₹)</label>
+    <input [(ngModel)]="newLoan().minAmount" type="number" placeholder="Eg: 50000" [disabled]="creating()">
+
+    <label>Maximum Amount (₹)</label>
+    <input [(ngModel)]="newLoan().maxAmount" type="number" placeholder="Eg: 2000000" [disabled]="creating()">
+
+    <label>Maximum Tenure (Months)</label>
+    <input [(ngModel)]="newLoan().maxTenureMonths" type="number" placeholder="Eg: 36" [disabled]="creating()">
+
+    <div class="popup-actions">
+      <button class="primary" [disabled]="creating()" (click)="create()">
+        {{creating() ? 'Creating...' : 'Create'}}
+      </button>
+      <button class="secondary" [disabled]="creating()" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
+</div>

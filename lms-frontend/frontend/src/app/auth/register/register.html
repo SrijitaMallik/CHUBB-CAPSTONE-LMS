@@ -1,0 +1,38 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <h2>REGISTER</h2>
+    <p>Create your LMS account</p>
+
+    <form (ngSubmit)="register()" #f="ngForm" novalidate>
+
+      <input type="text" placeholder="Full Name"
+             name="name"
+             [(ngModel)]="name" required>
+
+      <input type="email" placeholder="Email"
+             name="email"
+             [(ngModel)]="email" required>
+
+      <input type="password" placeholder="Password"
+             name="password"
+             [(ngModel)]="password" required>
+
+      <select name="role" [(ngModel)]="role" required>
+        <option value="">Select Role</option>
+        <option value="Customer">Customer</option>
+        <option value="LoanOfficer">Loan Officer</option>
+        <option value="LoanOfficer">Admin</option>
+      </select>
+
+      <button type="submit">Register Now</button>
+
+    </form>
+
+    <p class="login-text">
+      Already have an account?
+      <span (click)="goLogin()">Login</span>
+    </p>
+
+  </div>
+</div>

@@ -1,0 +1,46 @@
+.page-title{
+  font-size:28px;
+  font-weight:600;
+  margin-bottom:25px;
+  color:#1e3a8a;
+}
+
+.kpi-row{
+ display:flex;
+ gap:25px;
+ margin-bottom:35px;
+}
+
+.kpi-card{
+ background:white;
+ padding:22px;
+ border-radius:18px;
+ width:260px;
+ box-shadow:0 8px 20px rgba(0,0,0,0.08);
+ text-align:center;
+ transition:.3s;
+}
+.kpi-card:hover{transform:translateY(-5px)}
+
+.kpi-card h2{
+  font-size:34px;
+  color:#1e40af;
+}
+
+.grid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:35px;
+}
+
+.card{
+ background:white;
+ padding:25px;
+ border-radius:22px;
+ box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+
+canvas{
+ width:100%!important;
+ height:300px!important;
+}

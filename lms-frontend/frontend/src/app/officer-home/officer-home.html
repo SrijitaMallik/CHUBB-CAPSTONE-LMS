@@ -1,0 +1,78 @@
+<div class="saas-wrapper">
+
+  <div class="header-section">
+    <div>
+      <h2>Hello, Loan Officer 👋</h2>
+      <p class="sub">Here's what's happening with your loan applications today.</p>
+    </div>
+  </div>
+
+  <!-- ✅ Loading State -->
+  <div *ngIf="loading()" class="loading-container">
+    <p>Loading statistics...</p>
+  </div>
+
+  <!-- ✅ Error State -->
+  <div *ngIf="error() && !loading()" class="error-container">
+    <p class="error-message">{{ error() }}</p>
+    <button class="btn retry" (click)="refresh()">Retry</button>
+  </div>
+
+  <!-- ✅ Content -->
+  <div *ngIf="!loading() && !error()">
+
+    <!-- Quick Actions -->
+    <h4 class="section-title">QUICK ACTIONS</h4>
+
+    <div class="quick-actions-row">
+
+      <div class="quick-saas-card" routerLink="/loan-officer/applications">
+        <div class="icon blue">📄</div>
+        <div>
+          <b>Loan Applications</b>
+          <p>Review new applications and manage existing loans</p>
+        </div>
+        <span>→</span>
+      </div>
+
+      <div class="quick-saas-card" routerLink="/loan-officer/reports">
+        <div class="icon purple">📊</div>
+        <div>
+          <b>View Reports</b>
+          <p>Check EMI schedules, overdue payments, and analysis</p>
+        </div>
+        <span>→</span>
+      </div>
+
+    </div>
+
+    <!-- Overview -->
+    <h4 class="section-title">OVERVIEW</h4>
+
+    <div class="overview-row">
+
+      <div class="overview-card">
+        <small>Total Loans</small>
+        <h2>{{ stats().total }}</h2>
+      </div>
+
+      <div class="overview-card pending">
+        <small>Pending Approval</small>
+        <h2>{{ stats().pending }}</h2>
+      </div>
+
+      <div class="overview-card active">
+        <small>Active Loans</small>
+        <h2>{{ stats().active }}</h2>
+      </div>
+
+      <div class="overview-card rejected">
+        <small>Rejected</small>
+        <h2>{{ stats().rejected }}</h2>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

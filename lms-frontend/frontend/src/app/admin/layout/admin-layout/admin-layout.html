@@ -1,0 +1,24 @@
+<div class="sidebar">
+  <h2>LMS</h2>
+
+  <a (click)="navigate('/admin')" class="nav-link">Dashboard</a>
+
+  <a routerLink="officers" routerLinkActive="active">Pending Officers</a>
+
+  <a routerLink="loan-types" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+    Loan Types
+  </a>
+
+  <!-- <a routerLink="customers" routerLinkActive="active">Customers</a> -->
+
+  <a routerLink="notifications" routerLinkActive="active">Notifications</a>
+
+  <div style="flex:1"></div>
+
+  <!-- ✅ WORKING LOGOUT -->
+  <a class="logout-link" (click)="logout()">Logout</a>
+</div>
+
+<div class="content">
+  <router-outlet></router-outlet>
+</div>
