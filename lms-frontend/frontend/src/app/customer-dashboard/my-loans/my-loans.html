@@ -1,4 +1,5 @@
 <div class="my-loans-container">
+
   <button (click)="goBack()" class="back-link">
     ← Back to Dashboard
   </button>
@@ -6,19 +7,19 @@
   <h1>My Loans</h1>
   <p class="subtitle">View all your loan applications and their status</p>
 
-  <!-- Loading State -->
+  <!-- Loading -->
   <div *ngIf="isLoading" class="loading-container">
     <div class="spinner"></div>
     <p>Loading your loans...</p>
   </div>
 
-  <!-- Error State -->
+  <!-- Error -->
   <div *ngIf="!isLoading && error" class="error-message">
     <p>{{ error }}</p>
     <button (click)="loadLoans()" class="retry-btn">Retry</button>
   </div>
 
-  <!-- Empty State -->
+  <!-- Empty -->
   <div *ngIf="!isLoading && !error && loans.length === 0" class="empty-state">
     <div class="empty-icon">📋</div>
     <h3>No Loans Found</h3>
@@ -28,12 +29,12 @@
 
   <!-- Loans List -->
   <div *ngIf="!isLoading && !error && loans.length > 0" class="loans-grid">
-   <div *ngFor="let loan of pagedLoans">
+
+    <div *ngFor="let loan of pagedLoans" class="loan-card">
 
       <div class="loan-header">
-        <h3>Loan #{{ loan.loanApplicationId }}</h3>
-        <span 
-          class="status-badge" 
+        <h3>Loan #{{ loan.loanId }}</h3>
+        <span class="status-badge"
           [ngClass]="{
             'status-approved': loan.status === 'Approved',
             'status-pending': loan.status === 'Applied' || loan.status === 'UnderReview',
@@ -44,49 +45,51 @@
           {{ loan.status }}
         </span>
       </div>
-      
+
       <div class="loan-summary">
-  <div class="summary-row">
-    <span class="label">Loan Type:</span>
-    <span class="value">{{ loan.loanTypeName }}</span>
-  </div>
 
-  <div class="summary-row">
-    <span class="label">Amount:</span>
-    <span class="value amount">₹{{ loan.loanAmount | number:'1.0-0' }}</span>
-  </div>
+        <div class="summary-row">
+          <span class="label">Loan Type:</span>
+          <span class="value">{{ loan.loanType }}</span>
+        </div>
 
-  <div class="summary-row">
-    <span class="label">Tenure:</span>
-    <span class="value">{{ loan.tenureMonths }} months</span>
-  </div>
+        <div class="summary-row">
+          <span class="label">Amount:</span>
+          <span class="value amount">₹{{ loan.amount | number:'1.0-0' }}</span>
+        </div>
 
-  <div class="summary-row">
-    <span class="label">EMI:</span>
-    <span class="value">₹{{ loan.emiAmount | number:'1.0-0' }}</span>
-  </div>
-</div>
+        <div class="summary-row">
+          <span class="label">Tenure:</span>
+          <span class="value">{{ loan.tenure }} months</span>
+        </div>
 
-      
+        <div class="summary-row">
+          <span class="label">EMI:</span>
+          <span class="value">₹{{ loan.emi | number:'1.0-0' }}</span>
+        </div>
+
+      </div>
     </div>
-    
   </div>
-  <!-- Pagination Controls -->
-<div class="pagination-controls" *ngIf="loans.length > pageSize">
-  <button (click)="prevPage()" [disabled]="page===1">⬅ Prev</button>
-  <span>Page {{page}}</span>
-  <button (click)="nextPage()" [disabled]="page*pageSize >= loans.length">Next ➡</button>
-</div>
-<!-- Filter Bar -->
-<div class="filter-bar" *ngIf="loans.length > 0">
-  <label>Filter:</label>
-  <select [(ngModel)]="filterStatus" (change)="onFilterChange()">
-    <option value="All">All</option>
-    <option value="Approved">Active</option>
-    <option value="Closed">Closed</option>
-    <option value="Rejected">Rejected</option>
-    <option value="Pending">Pending<option>
-  </select>
-</div>
+
+  <!-- Pagination -->
+  <div class="pagination-controls" *ngIf="loans.length > pageSize">
+    <button (click)="prevPage()" [disabled]="page===1">⬅ Prev</button>
+    <span>Page {{page}}</span>
+    <button (click)="nextPage()" [disabled]="page*pageSize >= loans.length">Next ➡</button>
+  </div>
+
+  <!-- Filter -->
+  <div class="filter-bar" *ngIf="loans.length > 0">
+    <label>Filter:</label>
+    <select [(ngModel)]="filterStatus" (change)="onFilterChange()">
+      <option value="All">All</option>
+      <option value="Approved">Approved</option>
+      <option value="Active">Active</option>
+      <option value="Closed">Closed</option>
+      <option value="Rejected">Rejected</option>
+      <option value="Applied">Pending</option>
+    </select>
+  </div>
 
 </div>
