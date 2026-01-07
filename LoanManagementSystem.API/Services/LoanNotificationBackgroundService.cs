@@ -48,6 +48,15 @@ namespace LoanManagementSystem.API.Services
                     targetUserIds.AddRange(admins);
                 }
 
+                var loanExists = await db.LoanApplications
+    .AnyAsync(l => l.LoanApplicationId == evt.LoanId);
+
+                if (!loanExists)
+                {
+                    Console.WriteLine($"⚠ Invalid LoanId {evt.LoanId} – Notification skipped");
+                    continue;
+                }
+
                 foreach (var userId in targetUserIds.Distinct())
                 {
                     db.LoanNotifications.Add(new LoanNotification
@@ -62,6 +71,6 @@ namespace LoanManagementSystem.API.Services
                 await db.SaveChangesAsync();
                 Console.WriteLine($"NOTIFICATION => {evt.Title} for Loan {evt.LoanId} sent to {targetUserIds.Count} users");
             }
+            }
         }
-    }
 }
