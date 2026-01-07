@@ -172,8 +172,7 @@ http://localhost:4200
 | Role         | Email                                       | Password     |
 | ------------ | ------------------------------------------- | ------------ |
 | Admin        | [admin@lms.com](mailto:admin@lms.com)       | Admin@123    |
-| Loan Officer | [officer@lms.com](mailto:officer@lms.com)   | Officer@123  |
-| Customer     | [customer@lms.com](mailto:customer@lms.com) | Customer@123 |
+
 
 ---
 
