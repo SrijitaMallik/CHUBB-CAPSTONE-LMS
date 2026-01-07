@@ -1,4 +1,4 @@
-﻿using LoanManagementSystem.API.Data;
+using LoanManagementSystem.API.Data;
 using LoanManagementSystem.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -77,7 +77,7 @@ public class EmiController : ControllerBase
             EmiScheduleId = nextEmi.EmiScheduleId,
             PaidAmount = nextEmi.EmiAmount
         });
-
+        loan.OutstandingAmount -= nextEmi.EmiAmount;
         // 🔔 EMI PAID notification
         await LoanNotificationQueue.Channel.Writer.WriteAsync(new LoanNotificationEvent
         {
@@ -88,12 +88,12 @@ public class EmiController : ControllerBase
         });
 
         bool allPaid = !_context.EmiSchedules
-            .Any(e => e.LoanApplicationId == loanApplicationId && !e.IsPaid);
+     .Any(e => e.LoanApplicationId == loanApplicationId && !e.IsPaid);
 
         if (allPaid)
         {
+            loan.OutstandingAmount = 0;  
             loan.Status = "Closed";
-            _context.LoanApplications.Update(loan);   // 🔥 THIS LINE FIXES EVERYTHING
 
             await LoanNotificationQueue.Channel.Writer.WriteAsync(new LoanNotificationEvent
             {
@@ -103,7 +103,6 @@ public class EmiController : ControllerBase
                 Message = "Your loan has been closed successfully. Thank you!"
             });
         }
-
         await _context.SaveChangesAsync();
         return Ok($"EMI for Month {nextEmi.MonthNumber} paid successfully.");
     }
