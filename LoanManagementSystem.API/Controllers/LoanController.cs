@@ -1,4 +1,4 @@
-﻿using LoanManagementSystem.API.Data;
+using LoanManagementSystem.API.Data;
 using LoanManagementSystem.API.DTOs;
 using LoanManagementSystem.API.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -58,36 +58,35 @@ namespace LoanManagementSystem.API.Controllers
 
         }
 
-        [HttpGet("my-applications")]
+        [HttpGet("my")]
         public async Task<IActionResult> GetMyLoans()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
             var loans = await _context.LoanApplications
-    .Include(x => x.LoanType)
-    .Where(x => x.CustomerId == userId)
-    .Select(x => new
-    {
-        x.LoanApplicationId,
-        x.Status,
-        LoanTypeName = x.LoanType.LoanTypeName,
-        x.LoanAmount,
-        x.TenureMonths,
-        EmiAmount = x.EmiAmount
-    })
-    .ToListAsync();
-            
+                .Include(l => l.LoanType)
+                .Where(l => l.CustomerId == userId)     // ← remove Approved filter
+                .Select(l => new
+                {
+                    LoanId = l.LoanApplicationId,
+                    LoanType = l.LoanType!.LoanTypeName,
+                    Amount = l.LoanAmount,
+                    Tenure = l.TenureMonths,
+                    Emi = l.EmiAmount,
+                    Status = l.Status
+                })
+                .ToListAsync();
 
             return Ok(loans);
         }
+
+
+
         [HttpPost("pay-emi/{loanId}")]
         public async Task<IActionResult> PayEmi(int loanId, decimal amount)
         {
             var loan = await _context.LoanApplications.FindAsync(loanId);
-            if (loan == null) return NotFound("Loan not found");
-
-            if (loan.Status != "Approved")
-                return BadRequest("Loan is not active");
+            if (loan == null) return NotFound();
 
             loan.OutstandingAmount -= amount;
 
@@ -100,6 +99,8 @@ namespace LoanManagementSystem.API.Controllers
             await _context.SaveChangesAsync();
             return Ok(loan);
         }
+
+
         [HttpGet("my-active-loans")]
         public async Task<IActionResult> MyActiveLoans()
         {
@@ -111,6 +112,7 @@ namespace LoanManagementSystem.API.Controllers
 
             return Ok(loans);
         }
+
         [HttpGet("my-closed-loans")]
         public async Task<IActionResult> MyClosedLoans()
         {
@@ -122,7 +124,6 @@ namespace LoanManagementSystem.API.Controllers
 
             return Ok(loans);
         }
-
 
     }
 }
