@@ -1,4 +1,4 @@
-﻿using LoanManagementSystem.API.Data;
+using LoanManagementSystem.API.Data;
 using LoanManagementSystem.API.DTOs;
 using LoanManagementSystem.API.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -40,16 +40,34 @@ public class AdminController : ControllerBase
 
         officer.IsApproved = true;
         officer.IsActive = true;
-        await _context.SaveChangesAsync();
 
+        await LoanNotificationQueue.Channel.Writer.WriteAsync(new LoanNotificationEvent
+        {
+            UserId = officer.UserId,
+            Title = "Account Approved",
+            Message = "Your Loan Officer account has been approved by Admin."
+        });
+
+        
+        
+
+        await _context.SaveChangesAsync();
         return Ok(new { message = "Loan Officer Approved" });
     }
+
 
     [HttpDelete("reject-officer/{id}")]
     public async Task<IActionResult> RejectOfficer(int id)
     {
         var officer = await _context.Users.FindAsync(id);
         if (officer == null) return NotFound();
+
+        _context.LoanNotifications.Add(new LoanNotification
+        {
+            UserId = officer.UserId,
+            Title = "Account Rejected",
+            Message = "Your Loan Officer registration has been rejected by Admin."
+        });
 
         _context.Users.Remove(officer);
         await _context.SaveChangesAsync();
