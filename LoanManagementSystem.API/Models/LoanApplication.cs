@@ -1,12 +1,12 @@
-﻿using LoanManagementSystem.API.Models;
+using LoanManagementSystem.API.Models;
 
 public class LoanApplication
 {
     public int LoanApplicationId { get; set; }
     public int CustomerId { get; set; }
     public int LoanTypeId { get; set; }
-    public User Customer { get; set; }
-    public LoanType LoanType { get; set; }   // ADD
+    public User? Customer { get; set; }
+    public LoanType? LoanType { get; set; }   // ADD
 
     public decimal LoanAmount { get; set; }
     public int TenureMonths { get; set; }
