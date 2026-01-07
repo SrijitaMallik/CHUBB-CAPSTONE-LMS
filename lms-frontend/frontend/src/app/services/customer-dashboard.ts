@@ -8,7 +8,8 @@ export class CustomerDashboardService {
   constructor(private http: HttpClient) {}
 
   getMyLoans() {
-    return this.http.get(`${this.api}/loans/my-applications`);
+    return this.http.get<any[]>('http://localhost:5209/api/loans/my')
+
   }
 
   getMyEmis() {
