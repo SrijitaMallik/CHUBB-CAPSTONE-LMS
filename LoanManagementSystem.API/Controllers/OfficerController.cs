@@ -1,4 +1,4 @@
-﻿using LoanManagementSystem.API.Data;
+using LoanManagementSystem.API.Data;
 using LoanManagementSystem.API.DTOs;
 using LoanManagementSystem.API.Models;
 using LoanManagementSystem.API.Services;
@@ -47,9 +47,8 @@ namespace LoanManagementSystem.API.Controllers
                 return NotFound("Loan not found");
 
             loan.IsVerified = true;
-loan.VerificationRemarks = dto.Remarks;
-loan.Status = dto.IsApproved ? "Approved" : "Rejected";
-loan.VerifiedOn = DateTime.Now;   // ✅ YEH LINE ADD KARO
+            loan.VerificationRemarks = dto.Remarks;
+            loan.Status = dto.IsApproved ? "Approved" : "Rejected";
 
             if (dto.IsApproved)
             {
@@ -59,7 +58,8 @@ loan.VerifiedOn = DateTime.Now;   // ✅ YEH LINE ADD KARO
                     loan.LoanType.InterestRate
                 );
 
-                loan.OutstandingAmount = loan.LoanAmount; // 🔥 IMPORTANT
+                loan.EmiAmount = emi;                             // FIX
+                loan.OutstandingAmount = emi * loan.TenureMonths; // FIX
 
                 for (int i = 1; i <= loan.TenureMonths; i++)
                 {
@@ -71,8 +71,7 @@ loan.VerifiedOn = DateTime.Now;   // ✅ YEH LINE ADD KARO
                         DueDate = DateTime.Now.AddMonths(i)
                     });
                 }
-
-                await LoanNotificationQueue.Channel.Writer.WriteAsync(new LoanNotificationEvent
+            await LoanNotificationQueue.Channel.Writer.WriteAsync(new LoanNotificationEvent
                 {
                     LoanId = loan.LoanApplicationId,
                     UserId = loan.CustomerId,
@@ -94,6 +93,7 @@ loan.VerifiedOn = DateTime.Now;   // ✅ YEH LINE ADD KARO
             await _context.SaveChangesAsync();
             return Ok(loan);
         }
+
         [HttpGet("stats")]
         public IActionResult GetStats()
         {
