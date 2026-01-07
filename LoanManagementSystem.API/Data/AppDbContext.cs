@@ -1,4 +1,4 @@
-﻿using LoanManagementSystem.API.Models;
+using LoanManagementSystem.API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace LoanManagementSystem.API.Data
@@ -33,15 +33,20 @@ namespace LoanManagementSystem.API.Data
 
             modelBuilder.Entity<LoanApplication>()
                 .Property(x => x.LoanAmount).HasPrecision(18, 2);
+            modelBuilder.Entity<LoanApplication>()
+        .ToTable(tb => tb.UseSqlOutputClause(false));
 
             modelBuilder.Entity<LoanApplication>()
                 .Property(x => x.MonthlyIncome).HasPrecision(18, 2);
+            modelBuilder.Entity<LoanApplication>()
+    .ToTable(tb => tb.UseSqlOutputClause(false));
 
             modelBuilder.Entity<EMI>()
                 .Property(x => x.EMIAmount).HasPrecision(18, 2);
 
             modelBuilder.Entity<Payment>()
                 .Property(x => x.PaidAmount).HasPrecision(18, 2);
+
 
             modelBuilder.Entity<Loan>()
        .Property(x => x.Amount)
@@ -60,6 +65,14 @@ namespace LoanManagementSystem.API.Data
                 .HasPrecision(18, 2);
 
             modelBuilder.Entity<LoanType>().ToTable("LoanType");
+            modelBuilder.Entity<LoanApplication>()
+    .ToTable(tb => tb.UseSqlOutputClause(false));
+
+            modelBuilder.Entity<LoanNotification>()
+                .ToTable(tb => tb.UseSqlOutputClause(false));
+            modelBuilder.Entity<EmiSchedule>()
+    .ToTable(tb => tb.UseSqlOutputClause(false));
+
 
 
             base.OnModelCreating(modelBuilder);
