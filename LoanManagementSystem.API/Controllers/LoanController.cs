@@ -45,17 +45,46 @@ namespace LoanManagementSystem.API.Controllers
             _context.LoanApplications.Add(application);
             await _context.SaveChangesAsync();
 
+            // ✅ Notify Customer
             await LoanNotificationQueue.Channel.Writer.WriteAsync(
                 new LoanNotificationEvent
                 {
                     LoanId = application.LoanApplicationId,
                     UserId = userId,
                     Title = "Loan Applied",
-                    Message = "Your loan application has been submitted successfully and is under review."
+                    Message = "Your loan application has been submitted successfully and is under review.",
+                    NotifyCustomer = true,
+                    NotifyLoanOfficers = false,
+                    NotifyAdmins = false
+                });
+
+            // ✅ Notify Loan Officers
+            await LoanNotificationQueue.Channel.Writer.WriteAsync(
+                new LoanNotificationEvent
+                {
+                    LoanId = application.LoanApplicationId,
+                    UserId = 0, // Not specific to one user
+                    Title = "New Loan Application",
+                    Message = $"New loan application #{application.LoanApplicationId} for ${dto.LoanAmount} has been submitted.",
+                    NotifyCustomer = false,
+                    NotifyLoanOfficers = true,
+                    NotifyAdmins = false
+                });
+
+            // ✅ Notify Admins
+            await LoanNotificationQueue.Channel.Writer.WriteAsync(
+                new LoanNotificationEvent
+                {
+                    LoanId = application.LoanApplicationId,
+                    UserId = 0,
+                    Title = "New Loan Application",
+                    Message = $"New loan application #{application.LoanApplicationId} for ${dto.LoanAmount} requires attention.",
+                    NotifyCustomer = false,
+                    NotifyLoanOfficers = false,
+                    NotifyAdmins = true
                 });
 
             return Ok(new { message = "Loan applied successfully" });
-
         }
 
         [HttpGet("my")]
@@ -124,6 +153,7 @@ namespace LoanManagementSystem.API.Controllers
 
             return Ok(loans);
         }
+
 
     }
 }
