@@ -59,8 +59,8 @@ namespace LoanManagementSystem.API.Controllers
                     loan.LoanType.InterestRate
                 );
 
-                loan.EmiAmount = emi;                             // FIX
-                loan.OutstandingAmount = emi * loan.TenureMonths; // FIX
+                loan.EmiAmount = emi;                             
+                loan.OutstandingAmount = emi * loan.TenureMonths; 
 
                 for (int i = 1; i <= loan.TenureMonths; i++)
                 {
