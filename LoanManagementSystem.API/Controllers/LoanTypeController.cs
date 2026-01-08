@@ -1,4 +1,4 @@
-﻿using LoanManagementSystem.API.Data;
+using LoanManagementSystem.API.Data;
 using LoanManagementSystem.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +28,11 @@ namespace LoanManagementSystem.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetLoanTypes()
         {
-            return Ok(await _context.LoanTypes.ToListAsync());
+            return Ok(await _context.LoanTypes
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.LoanTypeName)
+                .ToListAsync());
         }
+
     }
 }
