@@ -30,22 +30,23 @@
         <!-- Loan Type -->
         <div class="form-group">
           <label for="loanType">Loan Type <span class="required">*</span></label>
-          <select
-            id="loanType"
-            [(ngModel)]="formData.loanType"
-            name="loanType"
-            required
-            class="form-control"
-          >
-            <option value="">Select loan type</option>
-            <option *ngFor="let type of loanTypes" [value]="type.loanTypeId">
-              {{ type.loanTypeName }}
-            </option>
-          </select>
+          
+         <select id="loanType"
+        [(ngModel)]="formData.loanType"
+        name="loanType"
+        (ngModelChange)="onLoanTypeChange()"
+        required
+        class="form-control">
+
+  <option value="">Select loan type</option>
+  <option *ngFor="let t of loanTypes" [value]="t.loanTypeId">
+    {{ t.loanTypeName }}
+  </option>
+</select>
+
           <small class="help-text">Choose the type of loan you want to apply for</small>
         </div>
 
-        <!-- Loan Amount -->
         <div class="form-group">
           <label for="loanAmount">Loan Amount (₹) <span class="required">*</span></label>
           <div class="input-wrapper">
