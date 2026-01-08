@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace LoanManagementSystem.API.Controllers;
-
 [Authorize(Roles = "Customer")]
 [ApiController]
 [Route("api/emis")]
@@ -43,7 +42,6 @@ public class EmiController : ControllerBase
      })
      .ToListAsync();
 
-
         return Ok(emis);
     }
 
@@ -56,64 +54,53 @@ public class EmiController : ControllerBase
         var loan = await _context.LoanApplications
             .FirstOrDefaultAsync(l => l.LoanApplicationId == loanApplicationId && l.CustomerId == userId);
 
-        if (loan == null)
-            return NotFound("Loan not found");
-
-        if (loan.Status != "Approved")
-            return BadRequest("Loan not approved");
+        if (loan == null) return NotFound("Loan not found");
+        if (loan.Status != "Approved") return BadRequest("Loan not approved");
 
         var nextEmi = await _context.EmiSchedules
             .Where(e => e.LoanApplicationId == loanApplicationId && !e.IsPaid)
             .OrderBy(e => e.MonthNumber)
             .FirstOrDefaultAsync();
 
-        if (nextEmi == null)
-            return BadRequest("All EMIs already paid");
+        if (nextEmi == null) return BadRequest("All EMIs already paid");
 
         nextEmi.IsPaid = true;
+
         _context.Receipts.Add(new Receipt
         {
             LoanApplicationId = loanApplicationId,
             EmiScheduleId = nextEmi.EmiScheduleId,
             PaidAmount = nextEmi.EmiAmount
         });
-        loan.OutstandingAmount -= nextEmi.EmiAmount;
-      
-        await LoanNotificationQueue.Channel.Writer.WriteAsync(new LoanNotificationEvent
+
+        await _context.SaveChangesAsync();
+
+        var remaining = await _context.EmiSchedules
+            .Where(e => e.LoanApplicationId == loanApplicationId && !e.IsPaid)
+            .SumAsync(e => e.EmiAmount);
+
+        loan.OutstandingAmount = remaining;
+
+        if (remaining == 0)
         {
-            LoanId = loanApplicationId,
-            UserId = userId,
-            Title = "EMI Paid",
-            Message = $"Your EMI for month {nextEmi.MonthNumber} has been paid successfully."
-        });
-
-        bool allPaid = !_context.EmiSchedules
-     .Any(e => e.LoanApplicationId == loanApplicationId && !e.IsPaid);
-
-        if(allPaid)
-{
-            loan.OutstandingAmount = 0;
             loan.Status = "Closed";
 
-            // Customer notification (already working)
             await LoanNotificationQueue.Channel.Writer.WriteAsync(new LoanNotificationEvent
             {
                 LoanId = loanApplicationId,
                 UserId = userId,
                 Title = "Loan Closed",
-                Message = "Your loan has been closed successfully. Thank you!"
+                Message = "Your loan has been fully paid and is now closed."
             });
 
-            // Admin notification (NEW)
             var admins = await _context.Users.Where(x => x.Role == "Admin").ToListAsync();
-
             foreach (var admin in admins)
             {
                 _context.LoanNotifications.Add(new LoanNotification
                 {
                     UserId = admin.UserId,
                     Title = "Loan Closed",
-                    Message = $"Loan #{loanApplicationId} has been fully paid by customer."
+                    Message = $"Loan #{loanApplicationId} fully paid."
                 });
             }
         }
@@ -146,7 +133,4 @@ public class EmiController : ControllerBase
 
         return Ok(receipts);
     }
-
-
-
 }
