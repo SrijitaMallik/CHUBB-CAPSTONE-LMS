@@ -25,12 +25,21 @@ namespace LoanManagementSystem.API.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            // ✅ Check LoanType exists
             var loanType = await _context.LoanTypes
                 .FirstOrDefaultAsync(x => x.LoanTypeId == dto.LoanTypeId);
 
             if (loanType == null)
                 return BadRequest("Invalid Loan Type");
+            
+            if (dto.TenureMonths > loanType.MaxTenureMonths)
+                return BadRequest($"Maximum tenure allowed for {loanType.LoanTypeName} is {loanType.MaxTenureMonths} months.");
+
+            if (dto.TenureMonths <= 0)
+                return BadRequest("Invalid tenure selected.");
+
+            if (dto.LoanAmount < loanType.MinAmount || dto.LoanAmount > loanType.MaxAmount)
+                return BadRequest($"Loan amount must be between {loanType.MinAmount} and {loanType.MaxAmount}");
+
 
             var application = new LoanApplication
             {
